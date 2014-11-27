@@ -3,18 +3,20 @@ package server
 import (
     "log"
     "net"
+    "github.com/gnicod/aion/scheduler"
 )
 
 type Server struct {
     l net.Listener
+    sch scheduler.Scheduler
 }
 
-func NewServer() Server{
+func NewServer(sch scheduler.Scheduler) Server{
     l, err := net.Listen("unix","/tmp/aion.sock" )
     if err != nil {
         log.Fatal("listen error:", err)
     }
-    serv := Server{l}
+    serv := Server{l, sch}
     return serv
 }
 

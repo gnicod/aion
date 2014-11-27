@@ -2,8 +2,10 @@ package client
 
 import (
     "net"
+    "os"
     "log"
     "time"
+    "github.com/gorhill/cronexpr"
 )
 
 type Client struct{
@@ -28,9 +30,22 @@ func (c *Client) reader(){
             return
         }
         println("Client got:", string(buf[0:n]))
+        //oO violent
+        os.Exit(0)
     }
 }
 
+func (c *Client) AddTask(t Task){
+    defer c.conn.Close()
+    for {
+        _, err := c.conn.Write(t)
+        if err != nil {
+            log.Fatal("write error:", err)
+            break
+        }
+        time.Sleep(10e9)
+    }
+}
 
 func (c *Client) Send(){
     defer c.conn.Close()
@@ -40,6 +55,6 @@ func (c *Client) Send(){
             log.Fatal("write error:", err)
             break
         }
-        time.Sleep(1e9)
+        time.Sleep(10e9)
     }
 }
