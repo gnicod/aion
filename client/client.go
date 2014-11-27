@@ -1,11 +1,13 @@
 package client
 
 import (
+    "bytes"
     "net"
-    "os"
+    //"os"
     "log"
     "time"
-    "github.com/gorhill/cronexpr"
+    "encoding/gob"
+    "github.com/gnicod/aion/scheduler"
 )
 
 type Client struct{
@@ -26,24 +28,25 @@ func (c *Client) reader(){
     buf := make([]byte, 1024)
     for {
         n, err := c.conn.Read(buf[:])
+        defer c.conn.Close()
         if err != nil {
             return
         }
         println("Client got:", string(buf[0:n]))
         //oO violent
-        os.Exit(0)
     }
 }
 
-func (c *Client) AddTask(t Task){
-    defer c.conn.Close()
-    for {
-        _, err := c.conn.Write(t)
-        if err != nil {
-            log.Fatal("write error:", err)
-            break
-        }
-        time.Sleep(10e9)
+func (c *Client) AddTask(t scheduler.Task){
+    var network bytes.Buffer
+    enc := gob.NewEncoder(&network)
+    err := enc.Encode(t)
+    if err != nil {
+        log.Fatal("encode error:", err)
+    }
+    _, err = c.conn.Write(network.Bytes())
+    if err != nil {
+        log.Fatal("write error:", err)
     }
 }
 

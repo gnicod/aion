@@ -2,7 +2,6 @@ package main
 
 import (
     "fmt"
-    "time"
     "flag"
     "github.com/gnicod/aion/server"
     "github.com/gnicod/aion/scheduler"
@@ -22,14 +21,9 @@ func main() {
     }
 
 
-    t1 := scheduler.NewTask("*/1 * * * *","ls /tmp")
-    t2 := scheduler.NewTask("*/2 * * * *","ls /home")
-    sch.AddTask(t1)
-    sch.AddTask(t2)
-    time.Sleep(5)
-    fmt.Println("client")
+    t1 := scheduler.NewTask("*/2 * * * *","ls /tmp")
     client := client.NewClient()
-    client.Send()
+    client.AddTask(t1)
 }
 
 func startServer(sch scheduler.Scheduler){

@@ -1,11 +1,12 @@
 package scheduler
 
 type Task struct{
-    expression string
-    command string
+    Expression string
+    Command string
 }
 
-func NewTask(expression string, command string) Task{
-    t := Task{expression,command}
+func NewTask(Expression string, Command string) Task{
+    t := Task{Expression,Command}
     return t
 }
+

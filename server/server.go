@@ -3,6 +3,7 @@ package server
 import (
     "log"
     "net"
+    "encoding/gob"
     "github.com/gnicod/aion/scheduler"
 )
 
@@ -32,18 +33,15 @@ func (s *Server) Listen(){
 }
 
 func (s *Server) serve(c net.Conn){
-    for {
-        buf := make([]byte, 512)
-        nr, err := c.Read(buf)
-        if err != nil {
-            return
-        }
+        dec := gob.NewDecoder(c)
+        t := &scheduler.Task{}
+        dec.Decode(t)
+        println("Received : %+v", t);
 
-        data := buf[0:nr]
-        println("Server got:", string(data))
-        _, err = c.Write(data)
+        println("Command:", string(t.Command))
+        println("Expression:", string(t.Expression))
+        _, err := c.Write([]byte(t.Command))
         if err != nil {
             log.Fatal("Write: ", err)
         }
-    }
 }

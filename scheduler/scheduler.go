@@ -18,7 +18,7 @@ func NewScheduler() Scheduler{
 }
 
 func (s *Scheduler) AddTask(task Task){
-    nextTime := cronexpr.MustParse(task.expression).Next(time.Now())
+    nextTime := cronexpr.MustParse(task.Expression).Next(time.Now())
     nowTime := time.Now().UTC()
     var duration time.Duration = nextTime.Sub(nowTime)
     ticker := time.NewTicker(duration)
@@ -28,7 +28,7 @@ func (s *Scheduler) AddTask(task Task){
     go func() {
         for t := range ticker.C {
             fmt.Println("Tick at", t)
-            fmt.Println(task.command)
+            fmt.Println(task.Command)
             ticker.Stop()
             s.AddTask(task)
         }
