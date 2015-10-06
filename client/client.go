@@ -3,8 +3,8 @@ package client
 import (
 	"bytes"
 	"crypto/tls"
-	"crypto/x509"
-	"fmt"
+	//"crypto/x509"
+	//"fmt"
 	"log"
 	"net"
 	//"os"
@@ -27,16 +27,15 @@ func NewClient() Client {
 	if err != nil {
 		log.Fatalf("client: dial: %s", err)
 	}
-	defer conn.Close()
 	log.Println("client: connected to: ", conn.RemoteAddr())
 
-	state := conn.ConnectionState()
-	for _, v := range state.PeerCertificates {
-		fmt.Println(x509.MarshalPKIXPublicKey(v.PublicKey))
-		fmt.Println(v.Subject)
-	}
-	log.Println("client: handshake: ", state.HandshakeComplete)
-	log.Println("client: mutual: ", state.NegotiatedProtocolIsMutual)
+	/*
+		state := conn.ConnectionState()
+			for _, v := range state.PeerCertificates {
+				fmt.Println(x509.MarshalPKIXPublicKey(v.PublicKey))
+				fmt.Println(v.Subject)
+			}
+	*/
 	client := Client{conn}
 	go client.reader()
 	return client
@@ -60,8 +59,9 @@ func (c *Client) AddTask(t scheduler.Task) {
 		log.Fatal("encode error:", err)
 	}
 	_, err = c.conn.Write(network.Bytes())
+	defer c.conn.Close()
 	if err != nil {
-		log.Fatal("write error:", err)
+		log.Fatal("add task write error:", err)
 	}
 }
 
