@@ -3,7 +3,6 @@ package server
 import (
 	"crypto/rand"
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/gob"
 	"github.com/gnicod/aion/scheduler"
 	"log"
@@ -42,13 +41,9 @@ func (s *Server) Listen() {
 		}
 		defer conn.Close()
 		log.Printf("server: accepted from %s", conn.RemoteAddr())
-		tlscon, ok := conn.(*tls.Conn)
+		_, ok := conn.(*tls.Conn)
 		if ok {
 			log.Print("ok=true")
-			state := tlscon.ConnectionState()
-			for _, v := range state.PeerCertificates {
-				log.Print(x509.MarshalPKIXPublicKey(v.PublicKey))
-			}
 		}
 		go s.serve(conn)
 	}
@@ -58,6 +53,7 @@ func (s *Server) serve(c net.Conn) {
 	dec := gob.NewDecoder(c)
 	t := &scheduler.Task{}
 	dec.Decode(t)
+	s.sch.AddTask(t)
 	println("Received : %+v", t)
 
 	println("Command:", string(t.Command))
