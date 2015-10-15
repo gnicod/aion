@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/tls"
 	"encoding/gob"
@@ -45,21 +46,31 @@ func (s *Server) Listen() {
 		if ok {
 			log.Print("ok=true")
 		}
+		log.Print("ahah")
 		go s.serve(conn)
 	}
 }
 
 func (s *Server) serve(c net.Conn) {
 	dec := gob.NewDecoder(c)
-	t := &scheduler.Task{}
+	//t := &scheduler.Task{}
+	t := Command{}
 	dec.Decode(t)
-	s.sch.AddTask(t)
-	println("Received : %+v", t)
 
-	println("Command:", string(t.Command))
-	println("Expression:", string(t.Expression))
-	_, err := c.Write([]byte(t.Command))
+	//s.sch.AddTask(t)
+
+	//println("Command:", string(t.Command))
+	//println("Expression:", string(t.Expression))
+	res := Response{Content: "list"}
+	var network bytes.Buffer
+	enc := gob.NewEncoder(&network)
+	err := enc.Encode(res)
 	if err != nil {
-		log.Fatal("Write: ", err)
+		log.Fatal("encode error:", err)
+	}
+	_, err = c.Write(network.Bytes())
+	defer c.Close()
+	if err != nil {
+		log.Fatal("write error:", err)
 	}
 }

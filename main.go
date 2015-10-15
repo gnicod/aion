@@ -16,14 +16,20 @@ func main() {
 	if *f_start {
 		sch := scheduler.NewScheduler()
 		startServer(sch)
-	}
-	if *f_list {
-		fmt.Println("connect to the server and list tasks")
+		return
 	}
 
-	t1 := scheduler.NewTask("*/1 * * * *", "ls /tmp")
 	client := client.NewClient()
-	client.AddTask(t1)
+	if *f_list {
+		fmt.Println("connect to the server and list tasks")
+
+		client.SendCommand(server.Command{Name: server.LISTTASKS})
+		return
+	}
+
+	//TODO send a command containing a task
+	//t1 := scheduler.NewTask("*/1 * * * *", "ls /tmp")
+	//client.AddTask(t1)
 }
 
 func startServer(sch scheduler.Scheduler) {

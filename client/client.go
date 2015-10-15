@@ -3,14 +3,11 @@ package client
 import (
 	"bytes"
 	"crypto/tls"
-	//"crypto/x509"
-	//"fmt"
-	"log"
-	"net"
-	//"os"
 	"encoding/gob"
 	"github.com/gnicod/aion/scheduler"
-	"time"
+	"github.com/gnicod/aion/server"
+	"log"
+	"net"
 )
 
 type Client struct {
@@ -65,14 +62,22 @@ func (c *Client) AddTask(t scheduler.Task) {
 	}
 }
 
-func (c *Client) Send() {
+func (c *Client) SendCommand(command server.Command) {
+	var network bytes.Buffer
+	enc := gob.NewEncoder(&network)
+	err := enc.Encode(command)
+	if err != nil {
+		log.Fatal("encode error:", err)
+	}
+	_, err = c.conn.Write(network.Bytes())
+	dec := gob.NewDecoder(c.conn)
+	//t := &scheduler.Task{}
+	resp := server.Response{}
+	dec.Decode(resp)
+	log.Print(resp)
+	c.reader()
 	defer c.conn.Close()
-	for {
-		_, err := c.conn.Write([]byte("hi"))
-		if err != nil {
-			log.Fatal("write error:", err)
-			break
-		}
-		time.Sleep(10e9)
+	if err != nil {
+		log.Fatal("add task write error:", err)
 	}
 }
