@@ -1,0 +1,13 @@
+syntax = "proto3";
+package aion;
+
+message Job {
+    required string command // command to execute
+    required string when // command to execute
+}
+
+message Message {
+    required string name = 1
+    optional Job 
+}
+

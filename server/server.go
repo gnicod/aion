@@ -46,7 +46,6 @@ func (s *Server) Listen() {
 		if ok {
 			log.Print("ok=true")
 		}
-		log.Print("ahah")
 		go s.serve(conn)
 	}
 }

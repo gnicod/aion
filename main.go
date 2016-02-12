@@ -28,12 +28,12 @@ func main() {
 	}
 
 	//TODO send a command containing a task
-	//t1 := scheduler.NewTask("*/1 * * * *", "ls /tmp")
-	//client.AddTask(t1)
+	t1 := scheduler.NewTask("*/1 * * * *", "ls /tmp")
+	client.AddTask(t1)
 }
 
 func startServer(sch scheduler.Scheduler) {
-	fmt.Println("start")
+	fmt.Println("start server")
 	server := server.NewServer(sch)
 	for {
 		server.Listen()
